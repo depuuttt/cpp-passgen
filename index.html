@@ -8,12 +8,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
       rel="stylesheet"
     />
     <style>
       body {
-        font-family: "Inter", sans-serif;
+        font-family: "Nunito", sans-serif;
       }
       .fade-in {
         animation: fadeIn 0.5s ease-in-out;
@@ -28,18 +28,35 @@
           transform: translateY(0);
         }
       }
+      .slide-down {
+        max-height: 500px;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+      }
+      .slide-up {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin-top: 0 !important;
+        border-width: 0 !important;
+      }
+      input[type="checkbox"] {
+        transform: scale(1.2);
+      }
     </style>
   </head>
   <body
     class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4"
   >
     <div
-      class="w-full max-w-md bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-700"
+      class="w-full max-w-lg bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-700"
     >
       <div class="text-center mb-6">
         <h1 class="text-3xl font-bold text-white">Password Policy Enforcer</h1>
         <p class="text-gray-400 mt-2">
-          Enter a password to strengthen it based on security rules.
+          Strengthen a password based on customizable security rules.
         </p>
       </div>
 
@@ -69,7 +86,129 @@
             type="text"
             id="candidate"
             class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition duration-200"
-            placeholder="Enter a starting password"
+            placeholder="Enter a starting password (or leave blank)"
+          />
+        </div>
+      </div>
+
+      <!-- Policy Settings -->
+      <div class="mt-4">
+        <button
+          id="toggle-policy-btn"
+          class="w-full text-left text-indigo-400 hover:text-indigo-300 font-semibold py-2 flex justify-between items-center"
+        >
+          <span>Advanced Policy Settings</span>
+          <svg
+            id="policy-arrow"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 transition-transform duration-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+      </div>
+      <div
+        id="policy-settings"
+        class="slide-up mt-4 border-t border-gray-700 pt-4"
+      >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Length -->
+          <div class="space-y-4">
+            <div>
+              <label
+                for="minL"
+                class="block text-sm font-medium text-gray-400 mb-1"
+                >Min Length</label
+              >
+              <input
+                type="number"
+                id="minL"
+                value="8"
+                class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label
+                for="maxL"
+                class="block text-sm font-medium text-gray-400 mb-1"
+                >Max Length</label
+              >
+              <input
+                type="number"
+                id="maxL"
+                value="16"
+                class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+          </div>
+          <!-- Requirements -->
+          <div class="space-y-3 text-sm flex flex-col justify-center">
+            <label class="flex items-center gap-3"
+              ><input
+                type="checkbox"
+                id="reqLower"
+                checked
+                class="accent-indigo-500"
+              />
+              Require Lowercase</label
+            >
+            <label class="flex items-center gap-3"
+              ><input
+                type="checkbox"
+                id="reqUpper"
+                checked
+                class="accent-indigo-500"
+              />
+              Require Uppercase</label
+            >
+            <label class="flex items-center gap-3"
+              ><input
+                type="checkbox"
+                id="reqDigit"
+                checked
+                class="accent-indigo-500"
+              />
+              Require Digit</label
+            >
+            <label class="flex items-center gap-3"
+              ><input
+                type="checkbox"
+                id="reqSpec"
+                checked
+                class="accent-indigo-500"
+              />
+              Require Special</label
+            >
+            <label class="flex items-center gap-3"
+              ><input
+                type="checkbox"
+                id="noUser"
+                checked
+                class="accent-indigo-500"
+              />
+              Forbid Username</label
+            >
+          </div>
+        </div>
+        <div class="mt-4">
+          <label
+            for="specials"
+            class="block text-sm font-medium text-gray-400 mb-1"
+            >Allowed Special Characters</label
+          >
+          <input
+            type="text"
+            id="specials"
+            value="!@#$%&*?-_+="
+            class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           />
         </div>
       </div>
@@ -114,22 +253,8 @@
                 d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
               />
             </svg>
-            <span
-              id="copy-tooltip"
-              class="absolute right-full mr-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 border border-gray-600"
-            >
-              Copy
-            </span>
           </button>
         </div>
-      </div>
-
-      <!-- Policy Info -->
-      <div class="mt-6 text-xs text-gray-500 text-center space-y-1">
-        <p>
-          Policy: 8-16 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special
-          (!@#$%&*?-_+=). Cannot contain username.
-        </p>
       </div>
     </div>
 
@@ -144,43 +269,11 @@
     <script>
       // --- Core Logic Translated from C++ ---
 
-      /**
-       * Returns a random character from a given string.
-       * @param {string} s - The string to pick a character from.
-       * @returns {string} A random character.
-       */
       const rand_from = (s) => s[Math.floor(Math.random() * s.length)];
-
-      /**
-       * Generates a string of random characters.
-       * @param {number} n - The length of the string to generate.
-       * @param {string} pool - The character pool to draw from.
-       * @returns {string} The generated random string.
-       */
-      const rand_chars = (n, pool) => {
-        let out = "";
-        for (let i = 0; i < n; ++i) {
-          out += rand_from(pool);
-        }
-        return out;
-      };
-
-      /**
-       * Checks if a string contains a pattern, case-insensitively.
-       * @param {string} text - The string to search within.
-       * @param {string} pat - The pattern to search for.
-       * @returns {boolean} True if the pattern is found.
-       */
-      const contains_ci = (text, pat) => {
-        if (!pat) return false;
-        return text.toLowerCase().includes(pat.toLowerCase());
-      };
-
-      /**
-       * Shuffles an array or string in place.
-       * @param {Array|string} a - The array or string to shuffle.
-       * @returns {Array|string} The shuffled array or string.
-       */
+      const rand_chars = (n, pool) =>
+        Array.from({ length: n }, () => rand_from(pool)).join("");
+      const contains_ci = (text, pat) =>
+        !pat ? false : text.toLowerCase().includes(pat.toLowerCase());
       const shuffle = (a) => {
         const arr = Array.isArray(a) ? a : a.split("");
         for (let i = arr.length - 1; i > 0; i--) {
@@ -194,26 +287,24 @@
        * Checks if a password meets the defined security policy.
        * @param {string} pw - The password to check.
        * @param {string} username - The associated username.
-       * @param {number} minL - Minimum password length.
-       * @param {number} maxL - Maximum password length.
+       * @param {object} policy - The policy settings object.
        * @returns {boolean} True if the policy is met.
        */
-      const check_policy = (pw, username, minL = 8, maxL = 16) => {
-        if (pw.length < minL || pw.length > maxL) return false;
-        if (username && contains_ci(pw, username)) return false;
+      const check_policy = (pw, username, policy) => {
+        if (pw.length < policy.minL || pw.length > policy.maxL) return false;
+        if (policy.noUsername && username && contains_ci(pw, username))
+          return false;
 
-        const specials = "!@#$%&*?-_+=";
-        let hasLower = false,
-          hasUpper = false,
-          hasDigit = false,
-          hasSpec = false;
+        const hasLower = !policy.requireLower || /[a-z]/.test(pw);
+        const hasUpper = !policy.requireUpper || /[A-Z]/.test(pw);
+        const hasDigit = !policy.requireDigit || /[0-9]/.test(pw);
+        const hasSpec =
+          !policy.requireSpec ||
+          (policy.specials &&
+            new RegExp(
+              `[${policy.specials.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}]`
+            ).test(pw));
 
-        for (const c of pw) {
-          if (c >= "a" && c <= "z") hasLower = true;
-          else if (c >= "A" && c <= "Z") hasUpper = true;
-          else if (c >= "0" && c <= "9") hasDigit = true;
-          else if (specials.includes(c)) hasSpec = true;
-        }
         return hasLower && hasUpper && hasDigit && hasSpec;
       };
 
@@ -221,19 +312,24 @@
        * Enforces the password policy on a candidate string.
        * @param {string} candidate - The initial password string.
        * @param {string} username - The associated username.
-       * @param {number} minL - Minimum password length.
-       * @param {number} maxL - Maximum password length.
+       * @param {object} policy - The policy settings object.
        * @returns {string} A policy-compliant password.
        */
-      const enforce = (candidate, username, minL = 8, maxL = 16) => {
+      const enforce = (candidate, username, policy) => {
         const lowers = "abcdefghijklmnopqrstuvwxyz";
         const uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const digits = "0123456789";
-        const specials = "!@#$%&*?-_+=";
-        const pool_all = lowers + uppers + digits + specials;
+
+        // Build the master character pool based on policy
+        let pool_all = "";
+        if (policy.requireLower) pool_all += lowers;
+        if (policy.requireUpper) pool_all += uppers;
+        if (policy.requireDigit) pool_all += digits;
+        if (policy.requireSpec && policy.specials) pool_all += policy.specials;
+        if (pool_all.length === 0) pool_all = lowers + uppers + digits; // Fallback pool
 
         const remove_username = (s) => {
-          if (!username) return s;
+          if (!policy.noUsername || !username) return s;
           let low_s = s.toLowerCase();
           const low_u = username.toLowerCase();
           let pos = 0;
@@ -253,18 +349,18 @@
         let currentCandidate = candidate;
 
         while (
-          !check_policy(currentCandidate, username, minL, maxL) &&
+          !check_policy(currentCandidate, username, policy) &&
           attempts < 500
         ) {
           currentCandidate = remove_username(currentCandidate);
 
-          if (currentCandidate.length > maxL) {
-            currentCandidate = currentCandidate.substring(0, maxL);
+          if (currentCandidate.length > policy.maxL) {
+            currentCandidate = currentCandidate.substring(0, policy.maxL);
             currentCandidate = remove_username(currentCandidate);
           }
-          if (currentCandidate.length < minL) {
+          if (currentCandidate.length < policy.minL) {
             currentCandidate += rand_chars(
-              minL - currentCandidate.length,
+              policy.minL - currentCandidate.length,
               pool_all
             );
           }
@@ -272,69 +368,59 @@
           let hasLower = /[a-z]/.test(currentCandidate);
           let hasUpper = /[A-Z]/.test(currentCandidate);
           let hasDigit = /[0-9]/.test(currentCandidate);
-          let hasSpec = new RegExp(
-            `[${specials.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}]`
-          ).test(currentCandidate);
+          let hasSpec =
+            policy.specials &&
+            new RegExp(
+              `[${policy.specials.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}]`
+            ).test(currentCandidate);
 
           let candidateArr = currentCandidate.split("");
           let idx = Array.from(Array(candidateArr.length).keys());
           shuffle(idx);
           let ix = 0;
 
-          if (!hasLower && ix < idx.length)
+          if (policy.requireLower && !hasLower && ix < idx.length)
             candidateArr[idx[ix++]] = rand_from(lowers);
-          if (!hasUpper && ix < idx.length)
+          if (policy.requireUpper && !hasUpper && ix < idx.length)
             candidateArr[idx[ix++]] = rand_from(uppers);
-          if (!hasDigit && ix < idx.length)
+          if (policy.requireDigit && !hasDigit && ix < idx.length)
             candidateArr[idx[ix++]] = rand_from(digits);
-          if (!hasSpec && ix < idx.length)
-            candidateArr[idx[ix++]] = rand_from(specials);
+          if (
+            policy.requireSpec &&
+            !hasSpec &&
+            ix < idx.length &&
+            policy.specials
+          )
+            candidateArr[idx[ix++]] = rand_from(policy.specials);
 
           currentCandidate = candidateArr.join("");
 
-          if (currentCandidate.length < minL) {
+          if (currentCandidate.length < policy.minL) {
             currentCandidate += rand_chars(
-              minL - currentCandidate.length,
+              policy.minL - currentCandidate.length,
               pool_all
             );
           }
 
           currentCandidate = shuffle(currentCandidate);
-
-          if (contains_ci(currentCandidate, username)) {
-            const p = currentCandidate
-              .toLowerCase()
-              .indexOf(username.toLowerCase());
-            let s_arr = currentCandidate.split("");
-            for (
-              let k = 0;
-              k < username.length && p + k < currentCandidate.length;
-              ++k
-            ) {
-              s_arr[p + k] = rand_from(pool_all);
-            }
-            currentCandidate = s_arr.join("");
-          }
-
           attempts++;
         }
 
-        if (!check_policy(currentCandidate, username, minL, maxL)) {
+        if (!check_policy(currentCandidate, username, policy)) {
           let pw = "";
-          pw += rand_from(lowers);
-          pw += rand_from(uppers);
-          pw += rand_from(digits);
-          pw += rand_from(specials);
-          const remaining = Math.max(minL, 8) - 4;
-          pw += rand_chars(remaining, pool_all);
-          pw = shuffle(pw);
-          currentCandidate = pw;
-          if (username && contains_ci(currentCandidate, username)) {
-            currentCandidate = "A1!abcdef"; // Fallback
-          }
+          if (policy.requireLower) pw += rand_from(lowers);
+          if (policy.requireUpper) pw += rand_from(uppers);
+          if (policy.requireDigit) pw += rand_from(digits);
+          if (policy.requireSpec && policy.specials)
+            pw += rand_from(policy.specials);
+
+          const remaining = Math.max(policy.minL, pw.length) - pw.length;
+          if (remaining > 0) pw += rand_chars(remaining, pool_all);
+
+          currentCandidate = shuffle(pw.substring(0, policy.maxL));
         }
 
-        return currentCandidate;
+        return currentCandidate.substring(0, policy.maxL);
       };
 
       // --- DOM Interaction ---
@@ -344,40 +430,44 @@
       const resultContainer = document.getElementById("result-container");
       const resultInput = document.getElementById("result");
       const copyBtn = document.getElementById("copy-btn");
-      const copyTooltip = document.getElementById("copy-tooltip");
       const messageBox = document.getElementById("message-box");
+      const togglePolicyBtn = document.getElementById("toggle-policy-btn");
+      const policySettings = document.getElementById("policy-settings");
+      const policyArrow = document.getElementById("policy-arrow");
+
+      const getPolicySettings = () => ({
+        minL: parseInt(document.getElementById("minL").value, 10) || 8,
+        maxL: parseInt(document.getElementById("maxL").value, 10) || 16,
+        requireLower: document.getElementById("reqLower").checked,
+        requireUpper: document.getElementById("reqUpper").checked,
+        requireDigit: document.getElementById("reqDigit").checked,
+        requireSpec: document.getElementById("reqSpec").checked,
+        noUsername: document.getElementById("noUser").checked,
+        specials: document.getElementById("specials").value,
+      });
 
       enforceBtn.addEventListener("click", () => {
         const candidate = candidateInput.value;
         const username = usernameInput.value;
+        const policy = getPolicySettings();
 
-        if (!candidate.trim()) {
-          // If no candidate, generate a new one from scratch
-          const enforced = enforce("", username);
-          resultInput.value = enforced;
-        } else {
-          const enforced = enforce(candidate, username);
-          resultInput.value = enforced;
-        }
+        const enforced = enforce(candidate, username, policy);
+        resultInput.value = enforced;
 
         resultContainer.classList.remove("hidden");
         resultContainer.classList.add("fade-in");
       });
 
       candidateInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-          enforceBtn.click();
-        }
+        if (e.key === "Enter") enforceBtn.click();
       });
 
       copyBtn.addEventListener("click", () => {
-        // Use the Clipboard API for modern browsers
         if (navigator.clipboard) {
-          navigator.clipboard.writeText(resultInput.value).then(() => {
-            showCopyMessage();
-          });
+          navigator.clipboard
+            .writeText(resultInput.value)
+            .then(showCopyMessage);
         } else {
-          // Fallback for older browsers
           resultInput.select();
           document.execCommand("copy");
           showCopyMessage();
@@ -386,12 +476,21 @@
 
       function showCopyMessage() {
         messageBox.classList.remove("translate-x-full");
-        messageBox.classList.add("translate-x-0");
-        setTimeout(() => {
-          messageBox.classList.remove("translate-x-0");
-          messageBox.classList.add("translate-x-full");
-        }, 2000);
+        setTimeout(() => messageBox.classList.add("translate-x-full"), 2000);
       }
+
+      togglePolicyBtn.addEventListener("click", () => {
+        const isHidden = policySettings.classList.contains("slide-up");
+        if (isHidden) {
+          policySettings.classList.remove("slide-up");
+          policySettings.classList.add("slide-down");
+          policyArrow.style.transform = "rotate(180deg)";
+        } else {
+          policySettings.classList.remove("slide-down");
+          policySettings.classList.add("slide-up");
+          policyArrow.style.transform = "rotate(0deg)";
+        }
+      });
     </script>
   </body>
 </html>
