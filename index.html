@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Password Policy Enforcer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4"
+  >
+    <div
+      class="w-full max-w-md bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-700"
+    >
+      <div class="text-center mb-6">
+        <h1 class="text-3xl font-bold text-white">Password Policy Enforcer</h1>
+        <p class="text-gray-400 mt-2">
+          Enter a password to strengthen it based on security rules.
+        </p>
+      </div>
+
+      <!-- Input Fields -->
+      <div class="space-y-4">
+        <div>
+          <label
+            for="username"
+            class="block text-sm font-medium text-gray-400 mb-1"
+            >Username</label
+          >
+          <input
+            type="text"
+            id="username"
+            value="edit_me"
+            class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition duration-200"
+            placeholder="e.g., john.doe"
+          />
+        </div>
+        <div>
+          <label
+            for="candidate"
+            class="block text-sm font-medium text-gray-400 mb-1"
+            >Candidate Password</label
+          >
+          <input
+            type="text"
+            id="candidate"
+            class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition duration-200"
+            placeholder="Enter a starting password"
+          />
+        </div>
+      </div>
+
+      <!-- Enforce Button -->
+      <div class="mt-6">
+        <button
+          id="enforce-btn"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-300 shadow-lg shadow-indigo-900/50"
+        >
+          Enforce Policy
+        </button>
+      </div>
+
+      <!-- Result Display -->
+      <div id="result-container" class="mt-6 hidden">
+        <label class="block text-sm font-medium text-gray-400 mb-1"
+          >Secure Password</label
+        >
+        <div class="relative">
+          <input
+            readonly
+            id="result"
+            type="text"
+            class="w-full bg-gray-900 border border-gray-600 text-green-400 font-mono rounded-lg pl-4 pr-12 py-2.5"
+          />
+          <button
+            id="copy-btn"
+            class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-400 hover:text-white transition group"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+            <span
+              id="copy-tooltip"
+              class="absolute right-full mr-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 border border-gray-600"
+            >
+              Copy
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Policy Info -->
+      <div class="mt-6 text-xs text-gray-500 text-center space-y-1">
+        <p>
+          Policy: 8-16 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special
+          (!@#$%&*?-_+=). Cannot contain username.
+        </p>
+      </div>
+    </div>
+
+    <!-- Message Box for Copy Confirmation -->
+    <div
+      id="message-box"
+      class="fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300"
+    >
+      Password copied to clipboard!
+    </div>
+
+    <script>
+      // --- Core Logic Translated from C++ ---
+
+      /**
+       * Returns a random character from a given string.
+       * @param {string} s - The string to pick a character from.
+       * @returns {string} A random character.
+       */
+      const rand_from = (s) => s[Math.floor(Math.random() * s.length)];
+
+      /**
+       * Generates a string of random characters.
+       * @param {number} n - The length of the string to generate.
+       * @param {string} pool - The character pool to draw from.
+       * @returns {string} The generated random string.
+       */
+      const rand_chars = (n, pool) => {
+        let out = "";
+        for (let i = 0; i < n; ++i) {
+          out += rand_from(pool);
+        }
+        return out;
+      };
+
+      /**
+       * Checks if a string contains a pattern, case-insensitively.
+       * @param {string} text - The string to search within.
+       * @param {string} pat - The pattern to search for.
+       * @returns {boolean} True if the pattern is found.
+       */
+      const contains_ci = (text, pat) => {
+        if (!pat) return false;
+        return text.toLowerCase().includes(pat.toLowerCase());
+      };
+
+      /**
+       * Shuffles an array or string in place.
+       * @param {Array|string} a - The array or string to shuffle.
+       * @returns {Array|string} The shuffled array or string.
+       */
+      const shuffle = (a) => {
+        const arr = Array.isArray(a) ? a : a.split("");
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return Array.isArray(a) ? arr : arr.join("");
+      };
+
+      /**
+       * Checks if a password meets the defined security policy.
+       * @param {string} pw - The password to check.
+       * @param {string} username - The associated username.
+       * @param {number} minL - Minimum password length.
+       * @param {number} maxL - Maximum password length.
+       * @returns {boolean} True if the policy is met.
+       */
+      const check_policy = (pw, username, minL = 8, maxL = 16) => {
+        if (pw.length < minL || pw.length > maxL) return false;
+        if (username && contains_ci(pw, username)) return false;
+
+        const specials = "!@#$%&*?-_+=";
+        let hasLower = false,
+          hasUpper = false,
+          hasDigit = false,
+          hasSpec = false;
+
+        for (const c of pw) {
+          if (c >= "a" && c <= "z") hasLower = true;
+          else if (c >= "A" && c <= "Z") hasUpper = true;
+          else if (c >= "0" && c <= "9") hasDigit = true;
+          else if (specials.includes(c)) hasSpec = true;
+        }
+        return hasLower && hasUpper && hasDigit && hasSpec;
+      };
+
+      /**
+       * Enforces the password policy on a candidate string.
+       * @param {string} candidate - The initial password string.
+       * @param {string} username - The associated username.
+       * @param {number} minL - Minimum password length.
+       * @param {number} maxL - Maximum password length.
+       * @returns {string} A policy-compliant password.
+       */
+      const enforce = (candidate, username, minL = 8, maxL = 16) => {
+        const lowers = "abcdefghijklmnopqrstuvwxyz";
+        const uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const digits = "0123456789";
+        const specials = "!@#$%&*?-_+=";
+        const pool_all = lowers + uppers + digits + specials;
+
+        const remove_username = (s) => {
+          if (!username) return s;
+          let low_s = s.toLowerCase();
+          const low_u = username.toLowerCase();
+          let pos = 0;
+          while ((pos = low_s.indexOf(low_u, pos)) !== -1) {
+            let s_arr = s.split("");
+            for (let k = 0; k < low_u.length && pos + k < s.length; ++k) {
+              s_arr[pos + k] = rand_from(pool_all);
+            }
+            s = s_arr.join("");
+            low_s = s.toLowerCase();
+            pos += 1;
+          }
+          return s;
+        };
+
+        let attempts = 0;
+        let currentCandidate = candidate;
+
+        while (
+          !check_policy(currentCandidate, username, minL, maxL) &&
+          attempts < 500
+        ) {
+          currentCandidate = remove_username(currentCandidate);
+
+          if (currentCandidate.length > maxL) {
+            currentCandidate = currentCandidate.substring(0, maxL);
+            currentCandidate = remove_username(currentCandidate);
+          }
+          if (currentCandidate.length < minL) {
+            currentCandidate += rand_chars(
+              minL - currentCandidate.length,
+              pool_all
+            );
+          }
+
+          let hasLower = /[a-z]/.test(currentCandidate);
+          let hasUpper = /[A-Z]/.test(currentCandidate);
+          let hasDigit = /[0-9]/.test(currentCandidate);
+          let hasSpec = new RegExp(
+            `[${specials.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}]`
+          ).test(currentCandidate);
+
+          let candidateArr = currentCandidate.split("");
+          let idx = Array.from(Array(candidateArr.length).keys());
+          shuffle(idx);
+          let ix = 0;
+
+          if (!hasLower && ix < idx.length)
+            candidateArr[idx[ix++]] = rand_from(lowers);
+          if (!hasUpper && ix < idx.length)
+            candidateArr[idx[ix++]] = rand_from(uppers);
+          if (!hasDigit && ix < idx.length)
+            candidateArr[idx[ix++]] = rand_from(digits);
+          if (!hasSpec && ix < idx.length)
+            candidateArr[idx[ix++]] = rand_from(specials);
+
+          currentCandidate = candidateArr.join("");
+
+          if (currentCandidate.length < minL) {
+            currentCandidate += rand_chars(
+              minL - currentCandidate.length,
+              pool_all
+            );
+          }
+
+          currentCandidate = shuffle(currentCandidate);
+
+          if (contains_ci(currentCandidate, username)) {
+            const p = currentCandidate
+              .toLowerCase()
+              .indexOf(username.toLowerCase());
+            let s_arr = currentCandidate.split("");
+            for (
+              let k = 0;
+              k < username.length && p + k < currentCandidate.length;
+              ++k
+            ) {
+              s_arr[p + k] = rand_from(pool_all);
+            }
+            currentCandidate = s_arr.join("");
+          }
+
+          attempts++;
+        }
+
+        if (!check_policy(currentCandidate, username, minL, maxL)) {
+          let pw = "";
+          pw += rand_from(lowers);
+          pw += rand_from(uppers);
+          pw += rand_from(digits);
+          pw += rand_from(specials);
+          const remaining = Math.max(minL, 8) - 4;
+          pw += rand_chars(remaining, pool_all);
+          pw = shuffle(pw);
+          currentCandidate = pw;
+          if (username && contains_ci(currentCandidate, username)) {
+            currentCandidate = "A1!abcdef"; // Fallback
+          }
+        }
+
+        return currentCandidate;
+      };
+
+      // --- DOM Interaction ---
+      const enforceBtn = document.getElementById("enforce-btn");
+      const candidateInput = document.getElementById("candidate");
+      const usernameInput = document.getElementById("username");
+      const resultContainer = document.getElementById("result-container");
+      const resultInput = document.getElementById("result");
+      const copyBtn = document.getElementById("copy-btn");
+      const copyTooltip = document.getElementById("copy-tooltip");
+      const messageBox = document.getElementById("message-box");
+
+      enforceBtn.addEventListener("click", () => {
+        const candidate = candidateInput.value;
+        const username = usernameInput.value;
+
+        if (!candidate.trim()) {
+          // If no candidate, generate a new one from scratch
+          const enforced = enforce("", username);
+          resultInput.value = enforced;
+        } else {
+          const enforced = enforce(candidate, username);
+          resultInput.value = enforced;
+        }
+
+        resultContainer.classList.remove("hidden");
+        resultContainer.classList.add("fade-in");
+      });
+
+      candidateInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          enforceBtn.click();
+        }
+      });
+
+      copyBtn.addEventListener("click", () => {
+        // Use the Clipboard API for modern browsers
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(resultInput.value).then(() => {
+            showCopyMessage();
+          });
+        } else {
+          // Fallback for older browsers
+          resultInput.select();
+          document.execCommand("copy");
+          showCopyMessage();
+        }
+      });
+
+      function showCopyMessage() {
+        messageBox.classList.remove("translate-x-full");
+        messageBox.classList.add("translate-x-0");
+        setTimeout(() => {
+          messageBox.classList.remove("translate-x-0");
+          messageBox.classList.add("translate-x-full");
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
